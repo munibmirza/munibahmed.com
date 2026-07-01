@@ -1223,6 +1223,22 @@ tailwind.config = {
                background:rgba(30,25,15,.9); color:#efe9dc; font-size:12px; outline:none; }
   .ar-check { width:16px; height:16px; cursor:pointer; }
   .ar-query-row { display:grid; grid-template-columns:1fr auto auto auto; gap:8px; align-items:center; }
+
+  /* ===== What People Say (feedback) ===== */
+  .fb-card { border:1px solid var(--line); border-radius:16px; padding:20px;
+    background:rgba(255,255,255,.03); display:flex; flex-direction:column; gap:14px;
+    transition:transform .25s ease, border-color .25s ease; }
+  .fb-card:hover { transform:translateY(-3px); border-color:rgba(201,162,75,.4); }
+  .fb-quote { font-size:14px; line-height:1.65; color:var(--ink); font-style:italic; flex:1; }
+  .fb-quote::before { content:"\201C"; color:var(--accent); font-size:26px; line-height:0; vertical-align:-8px; margin-right:2px; }
+  .fb-head { display:flex; align-items:center; gap:12px; }
+  .fb-avatar { width:46px; height:46px; border-radius:50%; object-fit:cover; flex-shrink:0;
+    background:linear-gradient(135deg,#c9a24b,#8a6d2f); align-items:center; justify-content:center;
+    color:#1a1510; font-weight:700; font-size:15px; letter-spacing:.5px; }
+  .fb-name { font-weight:600; font-size:14px; color:var(--ink); line-height:1.2; }
+  .fb-desig { font-size:12px; color:var(--muted); margin-top:2px; }
+  .fb-li { color:var(--muted); transition:color .2s ease; flex-shrink:0; }
+  .fb-li:hover { color:#0a66c2; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
 </head>
@@ -1403,6 +1419,46 @@ tailwind.config = {
         </div>
       </div>
     </section>
+
+    <!-- what people say -->
+    <section class="glass p-8">
+      <div class="flex items-center gap-3 mb-2 flex-wrap">
+        <div class="gold-bar"></div>
+        <h2 class="h-serif text-2xl flex-1">What People Say</h2>
+        <button id="fbOpenBtn" class="btn-accent text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.9 9.9 0 01-4.28-.95L3 20l1.05-3.15A7.8 7.8 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+          Share your feedback
+        </button>
+      </div>
+      <p class="text-sm mb-6" style="color:var(--muted);">Feedback from colleagues, mentors and clients I've had the pleasure to work with.</p>
+      <div id="fbCards" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="text-sm" style="color:var(--muted);">Loading feedback…</div>
+      </div>
+    </section>
+
+    <!-- feedback submission modal -->
+    <div id="fbModal" class="fixed inset-0 modal-bg hidden items-center justify-center z-50 p-4">
+      <div class="glass p-7 w-full max-w-lg relative" style="max-height:92vh; overflow-y:auto;">
+        <button id="fbClose" class="absolute top-4 right-4 text-2xl leading-none" style="color:var(--muted);" title="Close">&times;</button>
+        <div class="flex items-center gap-3 mb-1">
+          <div class="gold-bar"></div>
+          <h3 class="h-serif text-xl">Share your feedback</h3>
+        </div>
+        <p class="text-xs mb-5" style="color:var(--muted);">Tell others about your experience working with me. Shown after a quick review.</p>
+        <form id="fbForm" class="space-y-3">
+          <div><label class="shl-label">Your Name *</label><input class="shl-input" name="name" required maxlength="80"/></div>
+          <div><label class="shl-label">Designation / Role *</label><input class="shl-input" name="designation" placeholder="e.g. Finance Manager at ABC Ltd." required maxlength="120"/></div>
+          <div><label class="shl-label">LinkedIn Profile URL</label><input class="shl-input" name="linkedin" type="url" placeholder="https://www.linkedin.com/in/…" maxlength="200"/></div>
+          <div><label class="shl-label">Photo URL <span style="opacity:.6">(optional — leave blank for initials)</span></label><input class="shl-input" name="photo" type="url" placeholder="Direct link to your photo" maxlength="300"/></div>
+          <div><label class="shl-label">Your Feedback *</label><textarea class="shl-input" name="message" rows="4" required maxlength="1000" style="resize:vertical"></textarea></div>
+          <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true"/>
+          <div id="fbMsg" class="text-xs min-h-[16px]" style="color:var(--accent);"></div>
+          <button type="submit" id="fbSubmit" class="btn-primary w-full justify-center">Submit feedback</button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <!-- ====================== PROJECTS ====================== -->
@@ -3830,6 +3886,151 @@ if (typeof revealNow === "function") {
   // =====================================================================
 
 
+</script>
+
+<!-- ===== What People Say — feedback wall (Google Sheets backend) ===== -->
+<script>
+(function () {
+  'use strict';
+
+  // ⬇⬇⬇  PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE (ends with /exec)  ⬇⬇⬇
+  var FEEDBACK_API = "https://script.google.com/macros/s/AKfycby6LLEqsbngXrCXigvHfw85TU4mpdU0jQTvMfYWgUuayuQWbSp76bt8dJLD2iia5BYS/exec";
+  // ⬆⬆⬆ ------------------------------------------------------------------ ⬆⬆⬆
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function initials(name) {
+    var parts = String(name || '').trim().split(/\s+/).slice(0, 2);
+    return parts.map(function (w) { return w.charAt(0); }).join('').toUpperCase() || '?';
+  }
+  function safeUrl(u) {
+    u = String(u || '').trim();
+    return /^https?:\/\//i.test(u) ? u : '';
+  }
+
+  function emptyState(msg) {
+    return '<div class="text-sm sm:col-span-2 lg:col-span-3 py-6 text-center" style="color:var(--muted);">' + esc(msg) + '</div>';
+  }
+
+  var LI_SVG = '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0H5C2.2 0 0 2.2 0 5v14c0 2.8 2.2 5 5 5h14c2.8 0 5-2.2 5-5V5c0-2.8-2.2-5-5-5zM8 19H5V8h3v11zM6.5 6.7c-1 0-1.7-.8-1.7-1.7S5.5 3.3 6.5 3.3 8.2 4.1 8.2 5 7.5 6.7 6.5 6.7zM20 19h-3v-5.6c0-1.4-.5-2.4-1.8-2.4-1 0-1.6.7-1.9 1.4v6.6h-3V8h3v1.3c.4-.7 1.2-1.6 2.9-1.6 2.1 0 3.8 1.4 3.8 4.3V19z"/></svg>';
+
+  function cardHtml(t) {
+    var photo = safeUrl(t.photo);
+    var avatar =
+      (photo ? '<img src="' + esc(photo) + '" class="fb-avatar" style="display:flex" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"/>' : '') +
+      '<div class="fb-avatar" style="display:' + (photo ? 'none' : 'flex') + '">' + esc(initials(t.name)) + '</div>';
+    var li = safeUrl(t.linkedin)
+      ? '<a href="' + esc(safeUrl(t.linkedin)) + '" target="_blank" rel="noopener" class="fb-li" title="View LinkedIn profile">' + LI_SVG + '</a>'
+      : '';
+    return '<div class="fb-card">' +
+      '<div class="fb-quote">' + esc(t.message) + '</div>' +
+      '<div class="fb-head">' + avatar +
+        '<div style="flex:1;min-width:0"><div class="fb-name">' + esc(t.name) + '</div>' +
+        '<div class="fb-desig">' + esc(t.designation) + '</div></div>' + li +
+      '</div></div>';
+  }
+
+  function render(rows) {
+    var wrap = document.getElementById('fbCards');
+    if (!wrap) return;
+    if (!rows || !rows.length) {
+      wrap.innerHTML = emptyState('No feedback yet — be the first to share your experience.');
+      return;
+    }
+    wrap.innerHTML = rows.map(cardHtml).join('');
+  }
+
+  // Load approved feedback via JSONP (avoids CORS with Apps Script)
+  function loadFeedback() {
+    var wrap = document.getElementById('fbCards');
+    if (!wrap) return;
+    if (!FEEDBACK_API) {
+      wrap.innerHTML = emptyState('The feedback wall is being set up — check back soon.');
+      return;
+    }
+    var cb = 'fbcb_' + Date.now();
+    var s = document.createElement('script');
+    var done = false;
+    window[cb] = function (rows) {
+      done = true;
+      render(rows);
+      try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+      if (s.parentNode) s.parentNode.removeChild(s);
+    };
+    s.onerror = function () {
+      wrap.innerHTML = emptyState('Could not load feedback right now.');
+      if (s.parentNode) s.parentNode.removeChild(s);
+    };
+    s.src = FEEDBACK_API + (FEEDBACK_API.indexOf('?') > -1 ? '&' : '?') + 'callback=' + cb + '&t=' + Date.now();
+    document.head.appendChild(s);
+    setTimeout(function () { if (!done) s.onerror(); }, 12000);
+  }
+
+  // ---- Modal open/close ----
+  var modal = document.getElementById('fbModal');
+  function openModal() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+  function closeModal() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+
+  var openBtn = document.getElementById('fbOpenBtn');
+  var closeBtn = document.getElementById('fbClose');
+  if (openBtn) openBtn.addEventListener('click', openModal);
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+
+  // ---- Submit ----
+  var form = document.getElementById('fbForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var msgEl = document.getElementById('fbMsg');
+      var btn = document.getElementById('fbSubmit');
+      if (form.website && form.website.value) { closeModal(); return; } // honeypot
+
+      if (!FEEDBACK_API) {
+        msgEl.style.color = '#f0a500';
+        msgEl.textContent = 'Submissions aren’t connected yet. Please try again later.';
+        return;
+      }
+      var payload = new URLSearchParams({
+        name: form.name.value.trim(),
+        designation: form.designation.value.trim(),
+        linkedin: form.linkedin.value.trim(),
+        photo: form.photo.value.trim(),
+        message: form.message.value.trim()
+      });
+      btn.disabled = true;
+      var oldTxt = btn.textContent;
+      btn.textContent = 'Sending…';
+      msgEl.style.color = 'var(--accent)';
+      msgEl.textContent = '';
+
+      fetch(FEEDBACK_API, { method: 'POST', mode: 'no-cors', body: payload })
+        .then(function () {
+          msgEl.style.color = '#22c55e';
+          msgEl.textContent = 'Thank you! Your feedback was submitted and will appear after review.';
+          form.reset();
+          btn.textContent = 'Submitted ✓';
+          setTimeout(function () { closeModal(); btn.disabled = false; btn.textContent = oldTxt; msgEl.textContent = ''; }, 2600);
+        })
+        .catch(function () {
+          msgEl.style.color = '#f0a500';
+          msgEl.textContent = 'Something went wrong. Please try again.';
+          btn.disabled = false;
+          btn.textContent = oldTxt;
+        });
+    });
+  }
+
+  // Load on start
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadFeedback);
+  } else {
+    loadFeedback();
+  }
+})();
 </script>
 </body>
 </html>
