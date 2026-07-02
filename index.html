@@ -1239,6 +1239,9 @@ tailwind.config = {
   .fb-desig { font-size:12px; color:var(--muted); margin-top:2px; }
   .fb-li { color:var(--muted); transition:color .2s ease; flex-shrink:0; }
   .fb-li:hover { color:#0a66c2; }
+  .fb-rel { display:inline-block; font-size:10.5px; font-weight:600; letter-spacing:.08em;
+    text-transform:uppercase; padding:3px 10px; border-radius:999px;
+    color:#c9a24b; background:rgba(201,162,75,.12); border:1px solid rgba(201,162,75,.35); }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
 </head>
@@ -2414,6 +2417,14 @@ tailwind.config = {
     <form id="fbForm" class="space-y-3">
       <div><label class="shl-label">Your Name *</label><input class="shl-input" name="name" required maxlength="80"/></div>
       <div><label class="shl-label">Designation / Role *</label><input class="shl-input" name="designation" placeholder="e.g. Finance Manager at ABC Ltd." required maxlength="120"/></div>
+      <div><label class="shl-label">You know me as a *</label>
+        <select class="shl-input" name="relationship" required>
+          <option value="" disabled selected>Select one…</option>
+          <option value="Colleague">Colleague</option>
+          <option value="Mentor">Mentor</option>
+          <option value="Client">Client</option>
+        </select>
+      </div>
       <div><label class="shl-label">LinkedIn Profile URL</label><input class="shl-input" name="linkedin" type="url" placeholder="https://www.linkedin.com/in/…" maxlength="200"/></div>
       <div><label class="shl-label">Photo URL <span style="opacity:.6">(optional — leave blank for initials)</span></label><input class="shl-input" name="photo" type="url" placeholder="Direct link to your photo" maxlength="300"/></div>
       <div><label class="shl-label">Your Feedback *</label><textarea class="shl-input" name="message" rows="4" required maxlength="1000" style="resize:vertical"></textarea></div>
@@ -3940,7 +3951,10 @@ if (typeof revealNow === "function") {
     var li = safeUrl(t.linkedin)
       ? '<a href="' + esc(safeUrl(t.linkedin)) + '" target="_blank" rel="noopener" class="fb-li" title="View LinkedIn profile">' + LI_SVG + '</a>'
       : '';
+    var rel = String(t.relationship || '').trim();
+    var relTag = rel ? '<span class="fb-rel">' + esc(rel) + '</span>' : '';
     return '<div class="fb-card">' +
+      (relTag ? '<div>' + relTag + '</div>' : '') +
       '<div class="fb-quote">' + esc(t.message) + '</div>' +
       '<div class="fb-head">' + avatar +
         '<div style="flex:1;min-width:0"><div class="fb-name">' + esc(t.name) + '</div>' +
@@ -4012,6 +4026,7 @@ if (typeof revealNow === "function") {
       var payload = new URLSearchParams({
         name: form.name.value.trim(),
         designation: form.designation.value.trim(),
+        relationship: form.relationship.value.trim(),
         linkedin: form.linkedin.value.trim(),
         photo: form.photo.value.trim(),
         message: form.message.value.trim()

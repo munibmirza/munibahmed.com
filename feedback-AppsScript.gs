@@ -1,6 +1,6 @@
 // Feedback backend for munibahmed.com
 // Sheet tab MUST be named "Feedback" with row 1 headers (exact order):
-// Timestamp | Name | Designation | LinkedIn | Photo | Message | Approved
+// Timestamp | Name | Designation | LinkedIn | Photo | Message | Approved | Relationship
 // A row shows on the website ONLY when its "Approved" cell = Yes
 
 var SHEET_NAME = 'Feedback';
@@ -16,7 +16,7 @@ function doGet(e) {
       if (String(r[6]).trim().toLowerCase() === 'yes') {
         rows.push({
           name: r[1], designation: r[2], linkedin: r[3],
-          photo: r[4], message: r[5]
+          photo: r[4], message: r[5], relationship: r[7]
         });
       }
     }
@@ -48,7 +48,8 @@ function doPost(e) {
       String(p.linkedin || '').slice(0, 200).trim(),
       String(p.photo || '').slice(0, 300).trim(),
       message,
-      'No'
+      'No',
+      String(p.relationship || '').slice(0, 20).trim()
     ]);
     return json({ ok: true });
   } catch (err) {
