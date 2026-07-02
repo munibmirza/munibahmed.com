@@ -2426,7 +2426,6 @@ tailwind.config = {
         </select>
       </div>
       <div><label class="shl-label">LinkedIn Profile URL</label><input class="shl-input" name="linkedin" type="url" placeholder="https://www.linkedin.com/in/…" maxlength="200"/></div>
-      <div><label class="shl-label">Photo URL <span style="opacity:.6">(optional — leave blank for initials)</span></label><input class="shl-input" name="photo" type="url" placeholder="Direct link to your photo" maxlength="300"/></div>
       <div><label class="shl-label">Your Feedback *</label><textarea class="shl-input" name="message" rows="4" required maxlength="1000" style="resize:vertical"></textarea></div>
       <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true"/>
       <div id="fbMsg" class="text-xs min-h-[16px]" style="color:var(--accent);"></div>
@@ -4028,7 +4027,6 @@ if (typeof revealNow === "function") {
         designation: form.designation.value.trim(),
         relationship: form.relationship.value.trim(),
         linkedin: form.linkedin.value.trim(),
-        photo: form.photo.value.trim(),
         message: form.message.value.trim()
       });
       btn.disabled = true;
