@@ -1438,27 +1438,6 @@ tailwind.config = {
       </div>
     </section>
 
-    <!-- feedback submission modal -->
-    <div id="fbModal" class="fixed inset-0 modal-bg hidden items-center justify-center z-50 p-4">
-      <div class="glass p-7 w-full max-w-lg relative" style="max-height:92vh; overflow-y:auto;">
-        <button id="fbClose" class="absolute top-4 right-4 text-2xl leading-none" style="color:var(--muted);" title="Close">&times;</button>
-        <div class="flex items-center gap-3 mb-1">
-          <div class="gold-bar"></div>
-          <h3 class="h-serif text-xl">Share your feedback</h3>
-        </div>
-        <p class="text-xs mb-5" style="color:var(--muted);">Tell others about your experience working with me. Shown after a quick review.</p>
-        <form id="fbForm" class="space-y-3">
-          <div><label class="shl-label">Your Name *</label><input class="shl-input" name="name" required maxlength="80"/></div>
-          <div><label class="shl-label">Designation / Role *</label><input class="shl-input" name="designation" placeholder="e.g. Finance Manager at ABC Ltd." required maxlength="120"/></div>
-          <div><label class="shl-label">LinkedIn Profile URL</label><input class="shl-input" name="linkedin" type="url" placeholder="https://www.linkedin.com/in/…" maxlength="200"/></div>
-          <div><label class="shl-label">Photo URL <span style="opacity:.6">(optional — leave blank for initials)</span></label><input class="shl-input" name="photo" type="url" placeholder="Direct link to your photo" maxlength="300"/></div>
-          <div><label class="shl-label">Your Feedback *</label><textarea class="shl-input" name="message" rows="4" required maxlength="1000" style="resize:vertical"></textarea></div>
-          <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true"/>
-          <div id="fbMsg" class="text-xs min-h-[16px]" style="color:var(--accent);"></div>
-          <button type="submit" id="fbSubmit" class="btn-primary w-full justify-center">Submit feedback</button>
-        </form>
-      </div>
-    </div>
   </div>
 
   <!-- ====================== PROJECTS ====================== -->
@@ -2406,6 +2385,28 @@ tailwind.config = {
       </button>
       <button type="button" id="gHave" class="w-full text-center text-[11px] uppercase tracking-[0.16em] pt-1"
         style="color:#9fb1bb;">I already signed up</button>
+    </form>
+  </div>
+</div>
+
+<!-- FEEDBACK SUBMISSION MODAL -->
+<div id="fbModal" class="fixed inset-0 modal-bg hidden items-center justify-center z-50 p-4">
+  <div class="glass p-7 w-full max-w-lg relative" style="max-height:92vh; overflow-y:auto;">
+    <button id="fbClose" class="absolute top-4 right-4 text-2xl leading-none" style="color:var(--muted);" title="Close">&times;</button>
+    <div class="flex items-center gap-3 mb-1">
+      <div class="gold-bar"></div>
+      <h3 class="h-serif text-xl">Share your feedback</h3>
+    </div>
+    <p class="text-xs mb-5" style="color:var(--muted);">Tell others about your experience working with me. Shown after a quick review.</p>
+    <form id="fbForm" class="space-y-3">
+      <div><label class="shl-label">Your Name *</label><input class="shl-input" name="name" required maxlength="80"/></div>
+      <div><label class="shl-label">Designation / Role *</label><input class="shl-input" name="designation" placeholder="e.g. Finance Manager at ABC Ltd." required maxlength="120"/></div>
+      <div><label class="shl-label">LinkedIn Profile URL</label><input class="shl-input" name="linkedin" type="url" placeholder="https://www.linkedin.com/in/…" maxlength="200"/></div>
+      <div><label class="shl-label">Photo URL <span style="opacity:.6">(optional — leave blank for initials)</span></label><input class="shl-input" name="photo" type="url" placeholder="Direct link to your photo" maxlength="300"/></div>
+      <div><label class="shl-label">Your Feedback *</label><textarea class="shl-input" name="message" rows="4" required maxlength="1000" style="resize:vertical"></textarea></div>
+      <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true"/>
+      <div id="fbMsg" class="text-xs min-h-[16px]" style="color:var(--accent);"></div>
+      <button type="submit" id="fbSubmit" class="btn-primary w-full justify-center">Submit feedback</button>
     </form>
   </div>
 </div>
