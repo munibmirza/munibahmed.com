@@ -1263,6 +1263,7 @@ tailwind.config = {
     <nav class="hidden sm:flex items-center gap-8">
       <a href="#/"         class="navlink" data-nav="page-home">Home</a>
       <a href="#/projects" class="navlink" data-nav="page-projects">Projects</a>
+      <a href="#/feedback" class="navlink" data-nav="page-feedback">Feedback</a>
       <a href="#/contact"  class="navlink" data-nav="page-contact">Contact</a>
     </nav>
     <a href="#/app" class="btn-primary text-xs">Launch&nbsp;P-1</a>
@@ -1420,24 +1421,6 @@ tailwind.config = {
       </div>
     </section>
 
-    <!-- what people say -->
-    <section class="glass p-8">
-      <div class="flex items-center gap-3 mb-2 flex-wrap">
-        <div class="gold-bar"></div>
-        <h2 class="h-serif text-2xl flex-1">What People Say</h2>
-        <button id="fbOpenBtn" class="btn-accent text-sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.9 9.9 0 01-4.28-.95L3 20l1.05-3.15A7.8 7.8 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-          </svg>
-          Share your feedback
-        </button>
-      </div>
-      <p class="text-sm mb-6" style="color:var(--muted);">Feedback from colleagues, mentors and clients I've had the pleasure to work with.</p>
-      <div id="fbCards" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <div class="text-sm" style="color:var(--muted);">Loading feedback…</div>
-      </div>
-    </section>
-
   </div>
 
   <!-- ====================== PROJECTS ====================== -->
@@ -1504,6 +1487,36 @@ tailwind.config = {
             </div>
           </div>
         </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ====================== FEEDBACK / WHAT PEOPLE SAY ====================== -->
+  <div id="page-feedback" class="space-y-10 hidden">
+    <section class="pt-4">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="gold-bar w-10"></div>
+        <span class="text-[11px] uppercase tracking-[0.3em] text-yellow-300/90">Testimonials</span>
+      </div>
+      <div class="flex items-end justify-between gap-4 flex-wrap">
+        <h1 class="h-serif leading-[0.92]" style="font-size:clamp(2.2rem,5.5vw,4rem); color:var(--ink);">
+          <span class="clip"><span style="--d:.05s">WHAT PEOPLE SAY.</span></span>
+        </h1>
+        <button id="fbOpenBtn" class="btn-accent text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.9 9.9 0 01-4.28-.95L3 20l1.05-3.15A7.8 7.8 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+          Share your feedback
+        </button>
+      </div>
+      <p class="reveal max-w-xl mt-5 text-base" style="--d:.4s; color:var(--ink);">
+        Feedback from colleagues, mentors and clients I've had the pleasure to work with.
+      </p>
+    </section>
+
+    <section>
+      <div id="fbCards" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="text-sm" style="color:var(--muted);">Loading feedback…</div>
       </div>
     </section>
   </div>
@@ -2886,6 +2899,7 @@ const ROUTES = {
   "":                       "page-home",
   "/":                      "page-home",
   "/projects":              "page-projects",
+  "/feedback":              "page-feedback",
   "/contact":               "page-contact",
   "/app":                   "page-app",
   "/c-grade-pending":       "page-c-grade",
@@ -2893,7 +2907,7 @@ const ROUTES = {
   "/cash-journal-cleaner":  "page-cash-cleaner",
   "/cs-notifications":      "page-cs-notif",
 };
-const ALL_PAGES = "#page-home, #page-projects, #page-contact, #page-app, #page-c-grade, #page-expense, #page-cash-cleaner, #page-cs-notif";
+const ALL_PAGES = "#page-home, #page-projects, #page-feedback, #page-contact, #page-app, #page-c-grade, #page-expense, #page-cash-cleaner, #page-cs-notif";
 function applyRoute() {
   const hash = (location.hash || "#/").replace(/^#/, "");
   const target = ROUTES[hash] || "page-home";
@@ -2901,7 +2915,7 @@ function applyRoute() {
   const $t = $("#" + target);
   $t.removeClass("hidden");
   // nav active state (app + workflow pages keep "Projects" lit)
-  const navFor = (target === "page-home" || target === "page-projects" || target === "page-contact")
+  const navFor = (target === "page-home" || target === "page-projects" || target === "page-feedback" || target === "page-contact")
     ? target : "page-projects";
   $(".navlink").removeClass("active").filter(`[data-nav="${navFor}"]`).addClass("active");
   // page-enter animation
@@ -4031,6 +4045,10 @@ if (typeof revealNow === "function") {
   } else {
     loadFeedback();
   }
+  // Refresh whenever the Feedback page is opened
+  window.addEventListener('hashchange', function () {
+    if ((location.hash || '').indexOf('feedback') > -1) loadFeedback();
+  });
 })();
 </script>
 </body>
